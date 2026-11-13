@@ -6,8 +6,6 @@
 
 *This section provides an introduction to the system and the six areas of responsibility it divides into.*
 
----
-
 ### 1.1 Purpose
 
 The Personal System is a modular workspace for managing productivity, knowledge, time, relationships, finances, and reflection. It provides a consistent structure for capturing information, turning it into useful outcomes, and reviewing progress.
