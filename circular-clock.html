@@ -1,59 +1,37 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Circular clock</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Time and weather</title>
 <style>
-  :root { color-scheme: light dark; --bg:#fff; --disc:#f9f8f7; --ink:#2c2c2b; --muted:#716e69; --track:#e6e5e3; --accent:#918e89; --divider:#c5c2bd; }
-  @media(prefers-color-scheme:dark) { :root { --bg:#191919; --disc:#202020; --ink:#f4f4f2; --muted:#bebbb5; --track:#383836; --accent:#a5a29c; --divider:#777570; } }
-  * { box-sizing:border-box; }
-  html, body { margin:0; min-height:100%; background:var(--bg); }
-  body { font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); }
-  main { display:flex; justify-content:center; align-items:center; padding:16px; min-height:220px; }
-  .clock { position:relative; width:190px; height:190px; display:grid; place-items:center; border-radius:50%; background:var(--disc); }
-  svg { position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); }
-  .track, .progress { fill:none; stroke-width:2; }
-  .track { stroke:var(--track); }
-  .progress { stroke:var(--accent); stroke-linecap:round; }
-  .clock-face { display:grid; grid-template-columns:1fr 1fr; align-items:center; width:146px; font-variant-numeric:tabular-nums; }
-  .half { min-width:0; display:flex; flex-direction:column; gap:5px; }
-  .left { align-items:flex-end; padding-right:10px; border-right:1px solid var(--divider); }
-  .right { align-items:flex-start; padding-left:10px; }
-  .number { font-size:40px; line-height:1.08; font-weight:350; letter-spacing:-.045em; }
-  .sub { font-size:13px; line-height:1.25; font-weight:500; color:var(--muted); }
-  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-  @media(max-width:220px) { main { padding:8px; } .clock { max-width:100%; aspect-ratio:1; height:auto; } }
+:root {color-scheme:light dark; --bg:#fff; --ink:#2c2c2b; --muted:#716e69; --line:#e6e5e3}
+@media(prefers-color-scheme:dark){:root{--bg:#191919;--ink:#f4f4f2;--muted:#bebbb5;--line:#41413f}}
+*{box-sizing:border-box} html,body{margin:0;background:var(--bg);min-height:100%;color:var(--ink)}
+body{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{display:flex;align-items:center;justify-content:center;min-height:160px;padding:24px 16px}
+.clock{text-align:center;font-variant-numeric:tabular-nums}
+.time{display:flex;align-items:center;justify-content:center;gap:8px;font-size:56px;line-height:1.05;font-weight:400;letter-spacing:-.055em}
+.colon{display:flex;flex-direction:column;gap:7px}.colon::before,.colon::after{content:"";width:5px;height:5px;background:currentColor}
+.detail{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:15px;color:var(--muted);font-size:14px;line-height:1.3;font-weight:500}
+.divider{width:1px;height:16px;background:var(--line)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 </head>
 <body>
-<main aria-label="Clock, Bogotá time">
-  <div class="clock">
-    <svg viewBox="0 0 190 190" aria-hidden="true"><circle class="track" cx="95" cy="95" r="92"/><circle class="progress" id="progress" cx="95" cy="95" r="92" pathLength="60" stroke-dasharray="0 60"/></svg>
-    <div class="clock-face" aria-hidden="true">
-      <div class="half left"><span class="number" id="hour">00</span><span class="sub" id="date">00</span></div>
-      <div class="half right"><span class="number" id="minute">00</span><span class="sub" id="day">MON</span></div>
-    </div>
-    <time class="sr-only" id="accessible-time"></time>
-  </div>
-</main>
+<main aria-label="Clock and weather"><div class="clock">
+  <div class="time" aria-hidden="true"><span id="hour">00</span><span class="colon"></span><span id="minute">00</span></div>
+  <div class="detail"><span id="date" aria-hidden="true">00 · MON</span><span class="divider" aria-hidden="true"></span><span id="weather" role="status" aria-live="polite">- -</span></div>
+  <time class="sr-only" id="accessible-time"></time>
+</div></main>
 <script>
 (() => {
-  const fmt = new Intl.DateTimeFormat('en-GB', {timeZone:'America/Bogota',hour:'2-digit',minute:'2-digit',day:'2-digit',weekday:'short',hourCycle:'h23'});
-  function tick() {
-    const now = new Date();
-    const parts = Object.fromEntries(fmt.formatToParts(now).map(({type,value}) => [type,value]));
-    document.getElementById('hour').textContent = parts.hour;
-    document.getElementById('minute').textContent = parts.minute;
-    document.getElementById('date').textContent = parts.day;
-    document.getElementById('day').textContent = parts.weekday.toUpperCase();
-    document.getElementById('progress').setAttribute('stroke-dasharray', `${now.getUTCSeconds()} 60`);
-    const time = document.getElementById('accessible-time');
-    time.dateTime = now.toISOString();
-    time.textContent = `${parts.hour}:${parts.minute}, ${parts.weekday} ${parts.day}, Bogotá time`;
-    setTimeout(tick, 1000 - Date.now()%1000 + 10);
-  }
+  const fmt=new Intl.DateTimeFormat('en-GB',{timeZone:'America/Bogota',hour:'2-digit',minute:'2-digit',day:'2-digit',weekday:'short',hourCycle:'h23'});
+  function tick(){const now=new Date(),p=Object.fromEntries(fmt.formatToParts(now).map(({type,value})=>[type,value]));document.getElementById('hour').textContent=p.hour;document.getElementById('minute').textContent=p.minute;document.getElementById('date').textContent=`${p.day} · ${p.weekday.toUpperCase()}`;const accessible=document.getElementById('accessible-time');accessible.dateTime=now.toISOString();accessible.textContent=`${p.hour}:${p.minute}, ${p.weekday} ${p.day}, Bogotá time`;setTimeout(tick,1000-Date.now()%1000+10)}
   tick();
+  const weather=document.getElementById('weather');
+  async function getJSON(url){const r=await fetch(url,{signal:AbortSignal.timeout(12000),cache:'no-store'});if(!r.ok)throw Error('Service unavailable');return r.json()}
+  async function updateWeather(){try{const loc=await getJSON('https://get.geojs.io/v1/ip/geo.json');if(loc.latitude==null||loc.longitude==null||loc.latitude===''||loc.longitude==='')throw Error('No location');const lat=Number(loc.latitude),lon=Number(loc.longitude);if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180)throw Error('Invalid location');const params=new URLSearchParams({latitude:String(lat),longitude:String(lon),current:'temperature_2m',temperature_unit:'celsius'});const data=await getJSON('https://api.open-meteo.com/v1/forecast?'+params);const temp=data?.current?.temperature_2m;if(typeof temp!=='number'||!Number.isFinite(temp))throw Error('No temperature');weather.textContent=`${Math.round(temp)} °C`;weather.title=`Current temperature${loc.city?' near '+loc.city:''} · Open-Meteo · IP location is approximate`;weather.setAttribute('aria-label',weather.title+': '+Math.round(temp)+' degrees Celsius');setTimeout(updateWeather,15*60*1000)}catch(_){weather.textContent='- -';weather.title='Could not load IP location or Open-Meteo weather';weather.setAttribute('aria-label',weather.title);setTimeout(updateWeather,5*60*1000)}}
+  updateWeather();
 })();
 </script>
 </body>
